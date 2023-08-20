@@ -1,0 +1,69 @@
+# todo: loop lines below so lineinfile backup can work
+- name: Make backup copy of /boot/config.txt just in case
+  ansible.builtin.copy:
+    src: /boot/config.txt
+    dest: /boot/config.txt.backup.{{ backup_timestamp }}
+    remote_src: true
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Uncomment dtparam line in file to boot config
+  lineinfile:
+    dest: /boot/config.txt
+    regexp: '^#dtparam=i2c_arm=on'
+    line: 'dtparam=i2c_arm=on'
+    state: present
+
+- name: add i2c baudrate to boot config
+  lineinfile:
+    dest: /boot/config.txt
+    create: yes
+    line: 'i2c_arm_baudrate=400000'
+    state: present
+
+- name: add dtoverlay line to boot config
+  lineinfile:
+    dest: /boot/config.txt
+    create: yes
+    line: 'dtoverlay=gpio-shutdown,gpio_pin=4,active_low=1,gpio_pull=up'
+    state: present
+
+# force i2c-dev into /etc/modules (see README for issue link)
+- name: manually add i2c-dev to modules (beware future overwrites)
+  lineinfile:
+    dest: /etc/modules
+    create: yes
+    line: 'i2c-dev'
+    state: present
+
+- name: Unconditionally reboot the machine with all defaults
+  ansible.builtin.reboot:
+
+- name: clone git repo to /home/piadmin
+  ansible.builtin.git:
+    repo: https://github.com/UCTRONICS/SKU_RM0004.git
+    dest: /home/{{ piuser }}/SKU_RM0004
+
+- name: run make command on installed git repo
+  ansible.builtin.command: make
+  args:
+    chdir: /home/{{ piuser }}/SKU_RM0004
+
+# test run of ./display command hangs up Ansible, only uncomment for testing/debugging
+# - name: test run ./display command with bash
+#   ansible.builtin.shell: ./display
+#   args:
+#     chdir: /home/{{ piuser }}/SKU_RM0004
+
+- name: add display command to rc.local to run display on boot
+  blockinfile:
+    path: /etc/rc.local
+    marker: "# {mark} ANSIBLE MANAGED BLOCK #"
+    insertbefore: 'exit 0'
+    state: present
+    block: |
+      cd /home/{{ piuser }}/SKU_RM0004
+      make clean
+      make
+      ./display &

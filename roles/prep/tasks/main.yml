@@ -1,0 +1,10 @@
+- name: Display the facts on distribution
+  debug:
+    msg: "Here are the facts: {{ ansible_facts.distribution_release }}"
+
+- name: install git to remote host
+  ansible.builtin.package:
+    name: git
+    state: present
+
+# todo: set static ip addresses on pis to avoid losing connection on reboot

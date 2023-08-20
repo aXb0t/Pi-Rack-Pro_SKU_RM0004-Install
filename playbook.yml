@@ -1,0 +1,9 @@
+- hosts: all
+  vars:
+    piuser: pi # change this to your pi user
+    backup_timestamp: "{{ ansible_facts.date_time.epoch }}"
+  remote_user: "{{ piuser }}"
+  become: true
+  roles:
+    - prep
+    - base
