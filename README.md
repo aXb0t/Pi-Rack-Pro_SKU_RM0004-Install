@@ -2,6 +2,8 @@
 
 Ansible playbook to install and configure the manufacturer software that runs the OLED displays on the UCTRONICS Pi Rack Pro.
 
+![Pi Rack PRO OLEDs Glowing Beautifully](pirackprooleds.jpg "Pi Rack Pro OLEDs Running")
+
 Run the script, change <piusername> to the pi root or admin user
 ```
 ansible-playbook playbook.yml -u <piusername> -k
