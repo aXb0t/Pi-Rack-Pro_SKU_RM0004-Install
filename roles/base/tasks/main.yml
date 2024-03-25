@@ -1,32 +1,32 @@
 # todo: loop lines below so lineinfile backup can work
-- name: Make backup copy of /boot/config.txt just in case
+- name: Make backup copy of "{{ boot_config_path }}" just in case
   ansible.builtin.copy:
-    src: /boot/config.txt
-    dest: /boot/config.txt.backup.{{ backup_timestamp }}
+    src: "{{ boot_config_path }}"
+    dest: "{{ boot_config_path }}.backup.{{ backup_timestamp }}"
     remote_src: true
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
 
 - name: Uncomment dtparam line in file to boot config
   lineinfile:
-    dest: /boot/config.txt
-    regexp: '^#dtparam=i2c_arm=on'
-    line: 'dtparam=i2c_arm=on'
+    dest: "{{ boot_config_path }}"
+    regexp: "^#dtparam=i2c_arm=on"
+    line: "dtparam=i2c_arm=on"
     state: present
 
 - name: add i2c baudrate to boot config
   lineinfile:
-    dest: /boot/config.txt
+    dest: "{{ boot_config_path }}"
     create: yes
-    line: 'i2c_arm_baudrate=400000'
+    line: "i2c_arm_baudrate=400000"
     state: present
 
 - name: add dtoverlay line to boot config
   lineinfile:
-    dest: /boot/config.txt
+    dest: "{{ boot_config_path }}"
     create: yes
-    line: 'dtoverlay=gpio-shutdown,gpio_pin=4,active_low=1,gpio_pull=up'
+    line: "dtoverlay=gpio-shutdown,gpio_pin=4,active_low=1,gpio_pull=up"
     state: present
 
 # force i2c-dev into /etc/modules (see README for issue link)
@@ -34,7 +34,7 @@
   lineinfile:
     dest: /etc/modules
     create: yes
-    line: 'i2c-dev'
+    line: "i2c-dev"
     state: present
 
 - name: Unconditionally reboot the machine with all defaults
@@ -60,7 +60,7 @@
   blockinfile:
     path: /etc/rc.local
     marker: "# {mark} ANSIBLE MANAGED BLOCK #"
-    insertbefore: 'exit 0'
+    insertbefore: "exit 0"
     state: present
     block: |
       cd /home/{{ piuser }}/SKU_RM0004

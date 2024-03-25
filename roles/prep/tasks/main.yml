@@ -6,5 +6,4 @@
   ansible.builtin.package:
     name: git
     state: present
-
 # todo: set static ip addresses on pis to avoid losing connection on reboot

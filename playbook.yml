@@ -1,6 +1,7 @@
 - hosts: all
   vars:
-    piuser: pi # change this to your pi user
+    piuser: admin # change this to your pi user
+    boot_config_path: /boot/firmware/config.txt # change this to your boot config file
     backup_timestamp: "{{ ansible_facts.date_time.epoch }}"
   remote_user: "{{ piuser }}"
   become: true
