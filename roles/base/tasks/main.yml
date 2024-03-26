@@ -40,6 +40,8 @@
 - name: Unconditionally reboot the machine with all defaults
   ansible.builtin.reboot:
 
+# TODO: refactor steps to clone and make vendor files
+
 - name: clone git repo to /home/piadmin
   ansible.builtin.git:
     repo: https://github.com/UCTRONICS/SKU_RM0004.git
@@ -49,12 +51,6 @@
   ansible.builtin.command: make
   args:
     chdir: /home/{{ piuser }}/SKU_RM0004
-
-# test run of ./display command hangs up Ansible, only uncomment for testing/debugging
-# - name: test run ./display command with bash
-#   ansible.builtin.shell: ./display
-#   args:
-#     chdir: /home/{{ piuser }}/SKU_RM0004
 
 - name: add display command to rc.local to run display on boot
   blockinfile:
@@ -67,3 +63,9 @@
       make clean
       make
       ./display &
+
+# clone UCTRONICS project to temp directory
+
+# make the project, then copy the binary to /usr/local/bin
+
+# tell rc.local to run the made script on boot
